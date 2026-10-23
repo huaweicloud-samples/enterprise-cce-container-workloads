@@ -1,0 +1,39 @@
+# Java Web 应用服务器（tomcat）工作负载
+# 资源：CPU 1 核；无节点调度形态内存 256Mi、节点池调度形态内存 2048Mi；端口 8080
+# 两种调度形态使用同一份定义，仅资源 requests/limits 按需调整：
+#   - 无节点容器集群：内存 256Mi
+#   - 节点池集群：内存 2048Mi
+# 日志采集到云日志服务（LTS）
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-webserver
+  namespace: app-workloads
+  labels:
+    app: tomcat-webserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tomcat-webserver
+  template:
+    metadata:
+      labels:
+        app: tomcat-webserver
+      annotations:
+        log.stdoutcollection.enabled: "true"
+        log.stderrcollection.enabled: "true"
+    spec:
+      containers:
+        - name: tomcat-webserver
+          image: tomcat
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "1"
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 256Mi
