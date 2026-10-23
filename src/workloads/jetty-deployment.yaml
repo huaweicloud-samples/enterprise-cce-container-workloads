@@ -1,0 +1,38 @@
+# Java Web 应用服务器（jetty）工作负载
+# 资源：CPU 0.5 核、内存 1024Mi；端口 8080 / 8443；日志采集到云日志服务（LTS）
+# 注：节点池调度形态可将内存下调至 512Mi，按实际场景调整 resources 即可。
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jetty
+  namespace: app-workloads
+  labels:
+    app: jetty
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jetty
+  template:
+    metadata:
+      labels:
+        app: jetty
+      annotations:
+        log.stdoutcollection.enabled: "true"
+        log.stderrcollection.enabled: "true"
+    spec:
+      containers:
+        - name: jetty
+          image: jetty
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 512m
+              memory: 1024Mi
+            limits:
+              cpu: 512m
+              memory: 1024Mi

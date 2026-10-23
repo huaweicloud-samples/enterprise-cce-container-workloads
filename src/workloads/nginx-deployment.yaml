@@ -1,0 +1,35 @@
+# Web 服务器（nginx）工作负载
+# 资源：CPU 0.25 核、内存 256Mi；端口 80；日志采集到云日志服务（LTS）
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: app-workloads
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+      annotations:
+        log.stdoutcollection.enabled: "true"
+        log.stderrcollection.enabled: "true"
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 256m
+              memory: 256Mi
+            limits:
+              cpu: 256m
+              memory: 256Mi

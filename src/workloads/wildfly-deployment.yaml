@@ -1,0 +1,44 @@
+# Java 应用服务器（wildfly）工作负载
+# 资源：CPU 0.5 核、内存 1024Mi；端口 8080 / 9990；日志采集到云日志服务（LTS）
+# 启动命令覆盖为监听 0.0.0.0（管理端口与业务端口均对外）。
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wildfly
+  namespace: app-workloads
+  labels:
+    app: wildfly
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wildfly
+  template:
+    metadata:
+      labels:
+        app: wildfly
+      annotations:
+        log.stdoutcollection.enabled: "true"
+        log.stderrcollection.enabled: "true"
+    spec:
+      containers:
+        - name: wildfly
+          image: jboss/wildfly
+          command:
+            - /opt/jboss/wildfly/bin/standalone.sh
+            - -bmanagement
+            - "0.0.0.0"
+            - -b
+            - "0.0.0.0"
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 9990
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 512m
+              memory: 1024Mi
+            limits:
+              cpu: 512m
+              memory: 1024Mi
